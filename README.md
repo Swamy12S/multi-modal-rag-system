@@ -5,7 +5,8 @@ A **production-ready Multi-Modal Retrieval-Augmented Generation (RAG) system** f
 This system supports **text, tables, and image OCR**, enabling accurate, context-grounded answers using **LangChain + HuggingFace models**.
 
 ---
-
+## Multi-Modal RAG System Demo
+https://drive.google.com/file/d/1K8hAZq1FWnCfxESvR-c64BDH2BQf0EcM/view?usp=sharing
 ## ✨ Features
 
 - 📄 Upload multiple PDF documents
