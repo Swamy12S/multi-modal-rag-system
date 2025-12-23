@@ -150,6 +150,6 @@ if Config.CONVERSATION_MESSAGES_LIMIT > 0 and Config.CONVERSATION_MESSAGES_LIMIT
     )
     st.stop()
 
-chain = show_upload_documents()
-show_message_history()
-show_chat_input(chain)
+# chain = show_upload_documents()  # Commented out for FastAPI
+# show_message_history()
+# show_chat_input(chain)

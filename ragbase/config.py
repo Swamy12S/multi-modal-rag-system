@@ -1,37 +1,20 @@
+# ragbase/config.py
 import os
-from pathlib import Path
+from dotenv import load_dotenv
 
-
+load_dotenv()
 
 class Config:
-    class Path:
-        APP_HOME = Path(os.getenv("APP_HOME", Path(__file__).parent.parent))
-        DATABASE_DIR = APP_HOME / "docs-db"
-        DOCUMENTS_DIR = APP_HOME / "tmp"
-        IMAGES_DIR = APP_HOME / "images"
+    # HuggingFace
+    HUGGINGFACE_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 
-    class Database:
-        DOCUMENTS_COLLECTION = "documents"
+    # Models
+    LLM_MODEL = os.getenv("HUGGING_FACE_MODEL", "google/flan-t5-base")
+    EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
-    class Model:
-        EMBEDDINGS = "BAAI/bge-small-en-v1.5"
-        RERANKER = "ms-marco-MiniLM-L-12-v2"
-        LOCAL_LLM = "gemma2:9b"
-        REMOTE_LLM = None  # Set to None since no Groq key
-        REMOTE_LLM_2 = "mixtral-8x7b-32768"  # Second remote LLM
-        # Use Hugging Face Inference API (set HUGGINGFACEHUB_API_TOKEN in .env)
-        USE_HUGGINGFACE = True
-        HUGGING_FACE_MODEL = "google/flan-t5-large"  # change to preferred HF model repo_id
-        TEMPERATURE = 0.0
-        MAX_TOKENS = 8000
-        USE_LOCAL = False
-        USE_MULTI_MODEL = True  # Enable multi-model LLM ensemble
+    # RAG
+    CHUNK_SIZE = 1000
+    CHUNK_OVERLAP = 200
 
-    class Retriever:
-        USE_RERANKER = True
-        USE_CHAIN_FILTER = False
-        USE_MULTIMODAL = True  # Enable multi-modal retrieval
-        USE_CITATIONS = True   # Include citations in answers
-
-    DEBUG = False
-    CONVERSATION_MESSAGES_LIMIT = 6
+    # Paths
+    UPLOAD_DIR = "tmp"

@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 # Chat with Your Document
+=======
+# Chat with Your Documents
+
+>>>>>>> 72e20a2 (first commit)
 
 
 

@@ -1,78 +1,65 @@
-from typing import Optional, List
+from typing import List
 
-from langchain.retrievers import ContextualCompressionRetriever
-from langchain.retrievers.document_compressors.chain_filter import LLMChainFilter
-from langchain_core.language_models import BaseLanguageModel
-from langchain_core.vectorstores import VectorStore, VectorStoreRetriever
 from langchain_core.documents import Document
-from langchain_qdrant import Qdrant
-
-from ragbase.config import Config
-from ragbase.model import create_embeddings, create_reranker
+from langchain_core.vectorstores import VectorStoreRetriever
+from langchain_community.vectorstores import FAISS
+from ragbase.ingestor import ingest_documents
+from ragbase.model import create_embeddings
 
 
 class MultiModalRetriever(VectorStoreRetriever):
-    """Enhanced retriever that handles multi-modal documents"""
-    
-    def invoke(self, input, config=None):
-        """Override to filter results by modality if needed"""
-        results = super().invoke(input, config)
-        
-        # Group results by modality for better context
+    """
+    Retriever that prioritizes modalities:
+    text > table > image_ocr
+    """
+
+    def invoke(self, query, config=None):
+        results = super().invoke(query, config)
+
         modality_groups = {}
         for doc in results:
             modality = doc.metadata.get("modality", "text")
-            if modality not in modality_groups:
-                modality_groups[modality] = []
-            modality_groups[modality].append(doc)
-        
-        # Reorder: prioritize text, then tables, then images
-        modality_priority = ["text", "table", "image_ocr"]
-        reordered = []
-        for modality in modality_priority:
-            if modality in modality_groups:
-                reordered.extend(modality_groups[modality])
-        
-        # Add any remaining modalities
-        for modality in modality_groups:
-            if modality not in modality_priority:
-                reordered.extend(modality_groups[modality])
-        
-        return reordered
+            modality_groups.setdefault(modality, []).append(doc)
+
+        ordered = []
+        for m in ["text", "table", "image_ocr"]:
+            ordered.extend(modality_groups.get(m, []))
+
+        # any remaining modalities
+        for m, docs in modality_groups.items():
+            if m not in ["text", "table", "image_ocr"]:
+                ordered.extend(docs)
+
+        return ordered
 
 
-def create_retriever(
-    llm: BaseLanguageModel, 
-    vector_store: Optional[VectorStore] = None,
-    use_multimodal: bool = True
+def build_retriever(
+    pdf_paths: List[str],
+    top_k: int = 5,
+    use_multimodal: bool = True,
 ) -> VectorStoreRetriever:
-    """Create a retriever with optional multi-modal support"""
-    if not vector_store:
-        vector_store = Qdrant.from_existing_collection(
-            embedding=create_embeddings(),
-            collection_name=Config.Database.DOCUMENTS_COLLECTION,
-            path=Config.Path.DATABASE_DIR,
-        )
+    """
+    Build a fast FAISS-based retriever from PDFs.
+    """
 
+    # 1️⃣ Ingest documents
+    documents: List[Document] = ingest_documents(
+        pdf_paths,
+        use_multimodal=use_multimodal
+    )
+
+    # 2️⃣ Embeddings
+    embeddings = create_embeddings()
+
+    # 3️⃣ Vector store
+    vectorstore = FAISS.from_documents(documents, embeddings)
+
+    # 4️⃣ Retriever
     if use_multimodal:
-        retriever = MultiModalRetriever(
-            vectorstore=vector_store,
+        return MultiModalRetriever(
+            vectorstore=vectorstore,
             search_type="similarity",
-            search_kwargs={"k": 5}
-        )
-    else:
-        retriever = vector_store.as_retriever(
-            search_type="similarity", search_kwargs={"k": 5}
+            search_kwargs={"k": top_k},
         )
 
-    if Config.Retriever.USE_RERANKER:
-        retriever = ContextualCompressionRetriever(
-            base_compressor=create_reranker(), base_retriever=retriever
-        )
-
-    if Config.Retriever.USE_CHAIN_FILTER:
-        retriever = ContextualCompressionRetriever(
-            base_compressor=LLMChainFilter.from_llm(llm), base_retriever=retriever
-        )
-
-    return retriever
+    return vectorstore.as_retriever(search_kwargs={"k": top_k})
