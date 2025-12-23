@@ -1,11 +1,4 @@
-# Chat with Your Documents
-
-
-## Demo
-
-
-https://github.com/user-attachments/assets/afe96643-0c10-4f6e-bf65-06a43adae9f7
-
+# Chat with Your Document
 
 
 
