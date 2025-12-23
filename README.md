@@ -1,13 +1,82 @@
-<<<<<<< HEAD
-# Chat with Your Document
-=======
-# Chat with Your Documents
+# Multi-Modal RAG System
 
->>>>>>> 72e20a2 (first commit)
+A **production-ready Multi-Modal Retrieval-Augmented Generation (RAG) system** for asking questions over PDF documents using **FastAPI (backend)** and **Streamlit (UI)**.
+
+This system supports **text, tables, and image OCR**, enabling accurate, context-grounded answers using **LangChain + HuggingFace models**.
+
+---
+
+## ✨ Features
+
+- 📄 Upload multiple PDF documents
+- 🧠 Multi-modal ingestion
+  - Text
+  - Tables
+  - Images with OCR
+- ✂️ Smart chunking (recursive + semantic)
+- 🔍 FAISS-based vector search
+- 🎯 Context-grounded answers (no hallucination)
+- 📚 Optional citation-aware responses
+- ⚡ FastAPI backend with OpenAPI docs
+- 💬 Streamlit chat UI
+- 🧪 Evaluation & verification suite
+
+---
+
+## 🏗️ Architecture
+<img width="585" height="605" alt="image" src="https://github.com/user-attachments/assets/5e4b1e90-29d1-426c-a760-1f7cc8d3b1f6" />
+
+## 📂 Project Structure
+<img width="471" height="709" alt="image" src="https://github.com/user-attachments/assets/36684788-902f-4038-aeab-a28c8ad186fa" />
+<img width="556" height="315" alt="image" src="https://github.com/user-attachments/assets/145f3879-fc01-4a37-b74e-d0109cbc7749" />
 
 
 
 
+---
+
+## 🧠 Models & Tech Stack
+
+### Language Model
+- HuggingFace Seq2Seq (default: `google/flan-t5-base`)
+
+### Embeddings
+- `sentence-transformers/all-MiniLM-L6-v2`
+
+### Vector Store
+- FAISS (CPU)
+
+### Multi-Modal Processing
+- PyMuPDF (PDF + images)
+- pdfplumber (tables)
+- pytesseract (OCR)
+- Pillow (image handling)
+
+---
+
+## 📦 Dependencies (Core)
+
+```txt
+fastapi==0.104.1
+uvicorn==0.24.0
+streamlit==1.36.0
+python-dotenv==1.0.1
+python-multipart==0.0.6
+
+langchain==0.2.6
+langchain-core>=0.2.10,<0.3.0
+langchain-community==0.2.6
+
+sentence-transformers==3.0.0
+transformers==4.35.2
+huggingface-hub>=0.20,<1.0
+
+faiss-cpu
+PyMuPDF==1.23.8
+pdfplumber==0.10.3
+pytesseract==0.3.10
+Pillow>=10.3,<11.0
+---
 ### Ingestor
 
 Extracts text from PDF documents and creates chunks (using semantic and character splitter) that are stored in a vector databse
@@ -30,4 +99,5 @@ Combines the LLM with the retriever to answer a given user question
 - [FastEmbed](https://qdrant.github.io/fastembed/) - lightweight and fast embedding generation
 - [Streamlit](https://streamlit.io/) - build UI for data apps
 - [PDFium](https://pdfium.googlesource.com/pdfium/) - PDF processing and text extraction
+---
 
