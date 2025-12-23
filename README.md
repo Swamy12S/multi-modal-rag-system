@@ -99,5 +99,60 @@ Combines the LLM with the retriever to answer a given user question
 - [FastEmbed](https://qdrant.github.io/fastembed/) - lightweight and fast embedding generation
 - [Streamlit](https://streamlit.io/) - build UI for data apps
 - [PDFium](https://pdfium.googlesource.com/pdfium/) - PDF processing and text extraction
----
+
+
+## Setup
+1️⃣ Create Virtual Environment
+python -m venv venv
+venv\Scripts\activate
+
+2️⃣ Install Dependencies
+pip install -r requirements.txt
+
+3️⃣ Environment Variables
+Create .env file:
+
+HUGGINGFACEHUB_API_TOKEN=your_huggingface_token
+HUGGING_FACE_MODEL=google/flan-t5-base
+
+(Optional)
+
+GROQ_API_KEY=your_groq_key
+
+🚀 Run the Application
+🔹 Start Backend (FastAPI)
+python -m uvicorn main:app --host 127.0.0.1 --port 8000
+
+API: http://127.0.0.1:8000
+Docs: http://127.0.0.1:8000/docs
+
+🔹 Start UI (Streamlit)
+streamlit run app.py
+
+UI: http://localhost:8501
+
+## API Endpoints
+Health Check
+GET /
+GET /health
+
+Upload PDFs
+POST /upload
+
+Ask Question
+POST /ask
+
+{
+  "question": "What are the key financial highlights?"
+}
+
+## Testing
+
+Run verification:
+python test_implementation.py
+
+
+## Expected output:
+  All tests passed!
+
 
